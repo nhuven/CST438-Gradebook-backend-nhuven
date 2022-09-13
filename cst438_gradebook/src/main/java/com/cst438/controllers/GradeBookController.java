@@ -96,6 +96,10 @@ public class GradeBookController {
 	@PostMapping("/assignment")
 	@Transactional
 	public Assignment addAssignment(@RequestBody Assignment a) {
+		
+		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		checkCourse(a.getCourse(), email);  // check that user name matches instructor email of the course.
+		
 		a = assignmentService.save(a);
 		
 		return a;
@@ -180,6 +184,20 @@ public class GradeBookController {
 		}
 		
 		return assignment;
+	}
+	
+	private Course checkCourse(int courseId, String email) {
+		// get course
+		Course course = courseRepository.findById(courseId).orElse(null);
+		if (course == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Course not found. "+courseId );
+		}
+		// check that user is the course instructor
+		if (!course.getInstructor().equals(email)) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+		}
+		
+		return course;
 	}
 
 }
