@@ -25,6 +25,7 @@ import com.cst438.domain.CourseDTOG;
 import com.cst438.domain.CourseRepository;
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.GradebookDTO;
+import com.cst438.services.AssignmentService;
 import com.cst438.services.RegistrationService;
 
 @RestController
@@ -42,6 +43,9 @@ public class GradeBookController {
 	
 	@Autowired
 	RegistrationService registrationService;
+	
+	@Autowired
+	AssignmentService assignmentService;
 	
 	// get assignments for an instructor that need grading
 	@GetMapping("/gradebook")
@@ -87,6 +91,14 @@ public class GradeBookController {
 			gradebook.grades.add(grade);
 		}
 		return gradebook;
+	}
+	
+	@PostMapping("/assignment")
+	@Transactional
+	public Assignment addAssignment(@RequestBody Assignment a) {
+		a = assignmentService.save(a);
+		
+		return a;
 	}
 	
 	@PostMapping("/course/{course_id}/finalgrades")
