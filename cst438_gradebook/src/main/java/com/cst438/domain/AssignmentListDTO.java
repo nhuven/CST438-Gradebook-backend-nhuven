@@ -2,6 +2,8 @@ package com.cst438.domain;
 
 import java.util.ArrayList;
 
+import javax.persistence.Entity;
+
 /*
  * a transfer object that is a list of assignment details
  */
@@ -14,6 +16,15 @@ public class AssignmentListDTO {
 		public String courseTitle;
 		public int courseId;
 
+		public AssignmentDTO() {
+			super();
+		}
+		
+		public AssignmentDTO(String assignmentName, String dueDate) {
+			this.assignmentName = assignmentName;
+			this.dueDate = dueDate;
+		}
+		
 		public AssignmentDTO(int assignmentId, int courseId, String assignmentName, String dueDate,
 				String courseTitle) {
 			this.assignmentId = assignmentId;
