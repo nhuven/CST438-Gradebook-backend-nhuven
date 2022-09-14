@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.cst438.domain.Assignment;
 import com.cst438.domain.AssignmentListDTO;
+import com.cst438.domain.AssignmentListDTO.AssignmentDTO;
 import com.cst438.domain.AssignmentGrade;
 import com.cst438.domain.AssignmentGradeRepository;
 import com.cst438.domain.AssignmentRepository;
@@ -25,6 +28,7 @@ import com.cst438.domain.CourseDTOG;
 import com.cst438.domain.CourseRepository;
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.GradebookDTO;
+import com.cst438.services.AssignmentService;
 import com.cst438.services.RegistrationService;
 
 @RestController
@@ -42,6 +46,9 @@ public class GradeBookController {
 	
 	@Autowired
 	RegistrationService registrationService;
+	
+	@Autowired
+	AssignmentService assignmentService;
 	
 	// get assignments for an instructor that need grading
 	@GetMapping("/gradebook")
@@ -87,6 +94,89 @@ public class GradeBookController {
 			gradebook.grades.add(grade);
 		}
 		return gradebook;
+	}
+	
+	@PostMapping("/assignment/{course_id}")
+	@Transactional
+	public Assignment addAssignment(@RequestBody Assignment a, @PathVariable int course_id) {
+		
+		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		
+		Course c = courseRepository.findById(course_id).orElse(null);
+		
+		// Check that course exists
+		if (c == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Course not found. " + course_id );
+		}
+		
+		// Check the user is authorized to add assignments to the course
+		if (!c.getInstructor().equals(email)) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+		}
+		
+		if (a.getName().isBlank()) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment name not provided." );
+		}
+		
+		if (a.getDueDate() == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Due date not provided." );
+		}
+		
+		a = assignmentService.save(a);
+		
+		return a;
+	}
+	
+	@PatchMapping("/assignment/{assignment_id}")
+	@Transactional
+	public Assignment updateAssignment(@RequestBody Assignment a, @PathVariable int assignment_id) {
+		
+		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		
+		Assignment update = assignmentRepository.findById(assignment_id).orElse(null);
+		
+		if (update == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. " + assignment_id );
+		}
+		
+		Course c = courseRepository.findById(update.getCourse().getCourse_id()).orElse(null);
+		// Check the user is authorized to add assignments to the course
+		if (!c.getInstructor().equals(email)) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+		}
+		
+		if (a.getName().isBlank()) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment name not provided." );
+		}
+		
+		update.setName(a.getName());
+		
+		update = assignmentService.save(update);
+		
+		return update;
+	}
+	
+	@DeleteMapping("/assignment/{assignment_id}")
+	@Transactional
+	public HttpStatus deleteAssignment(@PathVariable int assignment_id) {
+		
+		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		
+		Assignment delete = assignmentRepository.findById(assignment_id).orElse(null);
+		
+		if (delete == null) {
+			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Assignment not found. " + assignment_id );
+		}
+		
+		Course c = courseRepository.findById(delete.getCourse().getCourse_id()).orElse(null);
+		// Check the user is authorized to add assignments to the course
+		if (!c.getInstructor().equals(email)) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
+		}
+		
+		assignmentService.delete(delete);
+		
+		return HttpStatus.OK;
 	}
 	
 	@PostMapping("/course/{course_id}/finalgrades")
@@ -169,5 +259,6 @@ public class GradeBookController {
 		
 		return assignment;
 	}
+	
 
 }
