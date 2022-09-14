@@ -23,4 +23,9 @@ public class AssignmentService {
 		return a;
 	}
 	
+	public void delete(Assignment a) {
+		// create attempt entity and save to database
+		assignmentRepository.delete(a);
+	}
+	
 }
