@@ -69,7 +69,10 @@ public class Assignment {
 	
 	public boolean hasGraded() {
 		boolean result = false;
-		if (assignmentGrades.size() > 0) {
+		if (assignmentGrades == null) {
+			result = false;
+		}
+		else if (assignmentGrades.size() > 0) {
 			result = true;
 		}
 		return result;
