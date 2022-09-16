@@ -118,6 +118,10 @@ public class AssignmentController {
 			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
 		}
 		
+		if (delete.hasGraded()) {
+			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Assignment has already been graded. " );
+		}
+		
 		assignmentRepository.delete(delete);
 		
 		return HttpStatus.OK;

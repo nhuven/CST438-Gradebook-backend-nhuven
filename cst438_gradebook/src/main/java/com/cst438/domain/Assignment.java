@@ -11,9 +11,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Entity
 public class Assignment {
-	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
@@ -64,6 +65,17 @@ public class Assignment {
 	public String toString() {
 		return "Assignment [id=" + id + ", course_id=" + course.getCourse_id() + ", name=" + name + ", dueDate=" + dueDate
 				+ ", needsGrading=" + needsGrading + "]";
+	}
+	
+	public boolean hasGraded() {
+		boolean result = false;
+		if (assignmentGrades == null) {
+			result = false;
+		}
+		else if (assignmentGrades.size() > 0) {
+			result = true;
+		}
+		return result;
 	}
 	
 }
