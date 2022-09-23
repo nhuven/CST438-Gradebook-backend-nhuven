@@ -35,7 +35,7 @@ public class ProcessEnrollment {
 			newEnrollment.setStudentEmail(enrollmentDTO.studentEmail);
 			newEnrollment.setStudentName(enrollmentDTO.studentName);
 			newEnrollment.setCourse(course);
-			enrollment = enrollmentRepository.save(enrollment);
+			enrollment = enrollmentRepository.save(newEnrollment);
 		}
 		
 		enrollmentDTO.id = enrollment.getId();
