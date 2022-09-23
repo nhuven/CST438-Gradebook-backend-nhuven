@@ -16,6 +16,7 @@ import com.cst438.domain.CourseRepository;
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
+import com.cst438.services.ProcessEnrollment;
 
 @RestController
 public class EnrollmentController {
@@ -25,6 +26,9 @@ public class EnrollmentController {
 
 	@Autowired
 	EnrollmentRepository enrollmentRepository;
+	
+	@Autowired
+	ProcessEnrollment pe;
 
 	/*
 	 * endpoint used by registration service to add an enrollment to an existing
@@ -50,15 +54,7 @@ public class EnrollmentController {
 			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Student name not provided." );
 		}
 
-		Enrollment enrollment = new Enrollment();
-		
-		enrollment.setStudentEmail(enrollmentDTO.studentEmail);
-		enrollment.setStudentName(enrollmentDTO.studentName);
-		enrollment.setCourse(c);
-		
-		Enrollment newEnrollment = enrollmentRepository.save(enrollment);
-		
-		enrollmentDTO.id = newEnrollment.getId();
+		pe.processEnrollment(enrollmentDTO, c);
 		
 		return enrollmentDTO;
 
