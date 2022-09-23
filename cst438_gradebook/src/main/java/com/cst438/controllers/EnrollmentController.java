@@ -46,11 +46,11 @@ public class EnrollmentController {
 			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Course not found. " + enrollmentDTO.course_id );
 		}
 		
-		if (enrollmentDTO.studentEmail.isBlank()) {
+		if (enrollmentDTO.studentEmail == null || enrollmentDTO.studentEmail.isBlank()) {
 			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Student email not provided." );
 		}
 		
-		if (enrollmentDTO.studentName.isBlank()) {
+		if (enrollmentDTO.studentName == null || enrollmentDTO.studentName.isBlank()) {
 			throw new ResponseStatusException( HttpStatus.BAD_REQUEST, "Student name not provided." );
 		}
 
