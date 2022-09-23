@@ -54,22 +54,25 @@ public class RegistrationServiceMQ extends RegistrationService {
 		
 		// Check that course exists
 		if (c == null) {
-			System.out.println("RegistrationServiceREST: Enrollment request for invalid course.");
+			System.out.println("RegistrationServiceREST - receive: Enrollment request for invalid course.");
 			validRequest = false;
 		}
 		
-		else if (enrollmentDTO.studentEmail.isBlank()) {
-			System.out.println("RegistrationServiceREST: Student email not provided." );
+		else if (enrollmentDTO.studentEmail == null || enrollmentDTO.studentEmail.isBlank()) {
+			System.out.println("RegistrationServiceREST - receive: Student email not provided." );
 			validRequest = false;
 		}
 		
-		if (enrollmentDTO.studentName.isBlank()) {
-			System.out.println("RegistrationServiceREST: Student name not provided." );
+		if (enrollmentDTO.studentName == null || enrollmentDTO.studentName.isBlank()) {
+			System.out.println("RegistrationServiceREST - receive: Student name not provided." );
 			validRequest = false;
 		}
 		
 		if(validRequest)
 			pe.processEnrollment(enrollmentDTO, c);
+		else {
+			//some code to send a message back advising of the issue.
+		}
 	}
 
 	// sender of messages to Registration Service
@@ -77,6 +80,25 @@ public class RegistrationServiceMQ extends RegistrationService {
 	public void sendFinalGrades(int course_id, CourseDTOG courseDTO) {
 		 
 		//TODO  complete this method in homework 4
+		boolean validRequest = true;
+		Course c = courseRepository.findById(course_id).orElse(null);
+		
+		// Check that course exists
+		if (c == null) {
+			System.out.println("RegistrationServiceREST - sendFinalGrades: Enrollment request for invalid course.");
+			validRequest = false;
+		}
+		
+		if (courseDTO.grades == null || courseDTO.grades.size() == 0) {
+			System.out.println("RegistrationServiceREST - sendFinalGrades: No grades provided.");
+			validRequest = false;
+		}
+		
+		if (validRequest) {
+			System.out.println("Sending rabbitmq message: "+ courseDTO);
+			rabbitTemplate.convertAndSend(registrationQueue.getName(), courseDTO);
+			System.out.println("Message sent.");
+		}
 		
 	}
 
